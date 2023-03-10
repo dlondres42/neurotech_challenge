@@ -1,18 +1,18 @@
 """Main module."""
+import json
 import uvicorn
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, status
+from pydantic import validate_model
 from api.routers import router
 import pickle
 import pandas as pd
 from entrada import Entrada
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 
 app = FastAPI(title='Monitoramento de modelos', version="1.0.0")
 
-with open('../model.pkl', 'rb') as f:
+with open('monitoring/model.pkl', 'rb') as f:
     model = pickle.load(f)
 
 @app.get("/")
@@ -29,14 +29,29 @@ async def http_exception_handler(request, exc):
 
 @app.post("/predict")
 def prediction_test(entrada: Entrada):
-    entrada = entrada.dict()
+    """
+    Função que retorna uma predição, dado que uma entrada no formato
+    definido por Entrada em entrada.py foi fornecido. Os resultados podem
+    ser 0 ou 1.
+    """
+    try:
+        entrada = entrada.dict()
+        validate_model(Entrada, entrada)
+        try:
+            df = pd.DataFrame([entrada], columns=entrada.keys())
+            df = df.drop(columns=['TARGET'], axis=1)
 
-    df = pd.DataFrame([entrada], columns=entrada.keys())
-    df = df.drop(columns=['TARGET'], axis=1)
+            yhat = model.predict(df)[0]
 
-    yhat = model.predict(df)[0]
+            return {"predicao": int(yhat)}
+        except Exception as e:
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-    return {"predicao": int(yhat)}
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=400,
+            detail='Invalid JSON object provided'
+        ) 
 
 app.include_router(router, prefix="/v1")
 

@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/performance")
 
-with open('../model.pkl', 'rb') as f:
+with open('monitoring/model.pkl', 'rb') as f:
     model = pickle.load(f)
 
 
@@ -45,16 +45,17 @@ async def calculate_performance(entradas: List[Entrada]):
             volumetry = calculate_volumetry(df)
             auc = calculate_auc(df)
 
+            return JSONResponse(
+                content={
+                    'volumetry': volumetry,
+                    'auc_roc': auc
+                },
+                status_code=HTTPStatus.OK
+        )
+
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
         
-        return JSONResponse(
-        content={
-            'volumetry': volumetry,
-            'auc_roc': auc
-            },
-            status_code=HTTPStatus.OK
-        )
 
     except json.JSONDecodeError:
         raise HTTPException(
