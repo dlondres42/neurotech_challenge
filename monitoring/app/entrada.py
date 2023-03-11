@@ -2,6 +2,11 @@ from typing import Union
 from pydantic import BaseModel, validator
 from datetime import datetime
 
+"""
+Esse BaseModel vai servir para validar o json que está sendo
+imputado no endpoint de performance.
+"""
+
 class Entrada(BaseModel):
     VAR2: Union[str, None]
     IDADE: Union[float, None]

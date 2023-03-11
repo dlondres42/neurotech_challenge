@@ -32,7 +32,8 @@ def prediction_test(entrada: Entrada):
     """
     Função que retorna uma predição, dado que uma entrada no formato
     definido por Entrada em entrada.py foi fornecido. Os resultados podem
-    ser 0 ou 1.
+    ser 0 ou 1. Essa função não é exigida no desafio, mas serve apenas
+    para me ajudar a testar o comportamento do model.pkl e do BaseModel entrada
     """
     try:
         entrada = entrada.dict()

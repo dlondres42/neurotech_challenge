@@ -8,6 +8,10 @@ from main import app
 
 client = TestClient(app=app)
 
+"""
+    Este arquivo serve para testar o endpoint do calculo da performanmce
+"""
+
 with open("monitoring/batch_records.json", "r") as f:
     test_data = json.load(f)
 

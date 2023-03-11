@@ -10,7 +10,6 @@ Este arquivo visa testar o main.py e o BaseModel entrada, que
 é sempre esperado nas requisições post para performance.
 """
 
-
 client = TestClient(app=app)
 input_data = {
     "VAR2": "M",
